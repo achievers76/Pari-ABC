@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:audioplayers/audioplayers.dart';
 
 void main() {
   runApp(const PariABCApp());
@@ -26,33 +25,9 @@ class PariABCApp extends StatelessWidget {
   }
 }
 
-class HomeScreen extends StatefulWidget {
+// ==================== HOME SCREEN ====================
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
-
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  final AudioPlayer _audioPlayer = AudioPlayer();
-
-  // Function to play sound and show action message
-  void _onCardTap(String className) async {
-    try {
-      // Yahan aap apni audio file play kar sakte hain
-      // await _audioPlayer.play(AssetSource('sounds/chalo_nursery.mp3'));
-    } catch (e) {
-      debugPrint("Audio error: $e");
-    }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("Chalo $className me chalte hain!"),
-        duration: const Duration(seconds: 1),
-        backgroundColor: Colors.indigo,
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 10),
 
-                  // Upar ka Greeting Text
+                  // Greeting Text
                   Text(
                     "Namaste Beta! Aao Seekhte Hain",
                     textAlign: TextAlign.center,
@@ -95,35 +70,35 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Bich ke 3 Bade Card Buttons
+                  // 3 Bade Card Buttons
                   Expanded(
                     child: ListView(
                       children: [
                         _buildClassCard(
+                          context: context,
                           title: "NURSERY",
                           subtitle: "3-4 Saal Ke Liye",
                           cardColor: Colors.amber.shade200,
-                          lottieUrl:
-                              'https://assets2.lottiefiles.com/packages/lf20_q5pk6pzz.json', // Apple
-                          onTap: () => _onCardTap("Nursery"),
+                          themeColor: Colors.amber.shade700,
+                          lottieUrl: 'https://assets2.lottiefiles.com/packages/lf20_q5pk6pzz.json', // Apple
                         ),
                         const SizedBox(height: 16),
                         _buildClassCard(
+                          context: context,
                           title: "LKG",
                           subtitle: "4-5 Saal Ke Liye",
                           cardColor: Colors.green.shade200,
-                          lottieUrl:
-                              'https://assets5.lottiefiles.com/packages/lf20_1idq8zx3.json', // Ball
-                          onTap: () => _onCardTap("LKG"),
+                          themeColor: Colors.green.shade700,
+                          lottieUrl: 'https://assets5.lottiefiles.com/packages/lf20_1idq8zx3.json', // Ball
                         ),
                         const SizedBox(height: 16),
                         _buildClassCard(
+                          context: context,
                           title: "UKG",
                           subtitle: "5-6 Saal Ke Liye",
                           cardColor: Colors.blue.shade200,
-                          lottieUrl:
-                              'https://assets10.lottiefiles.com/packages/lf20_xybpny7a.json', // Lion
-                          onTap: () => _onCardTap("UKG"),
+                          themeColor: Colors.blue.shade700,
+                          lottieUrl: 'https://assets10.lottiefiles.com/packages/lf20_xybpny7a.json', // Lion
                         ),
                       ],
                     ),
@@ -142,8 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.indigo.shade800,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 24, vertical: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                     ),
                     child: Text(
                       "Mummy Papa Ke Liye",
@@ -163,16 +137,28 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Reusable Card Widget
+  // Reusable Card Widget for Nursery, LKG, UKG
   Widget _buildClassCard({
+    required BuildContext context,
     required String title,
     required String subtitle,
     required Color cardColor,
+    required Color themeColor,
     required String lottieUrl,
-    required VoidCallback onTap,
   }) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        // Yahan card dabane par agla page khulega
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ClassLearningPage(
+              className: title,
+              themeColor: themeColor,
+            ),
+          ),
+        );
+      },
       child: Container(
         height: 110,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -193,7 +179,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainCategory.center,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   title,
@@ -222,6 +208,191 @@ class _HomeScreenState extends State<HomeScreen> {
                 errorBuilder: (context, error, stackTrace) {
                   return const Icon(Icons.star, size: 40, color: Colors.orange);
                 },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ==================== NEXT CLASS LEARNING PAGE ====================
+class ClassLearningPage extends StatelessWidget {
+  final String className;
+  final Color themeColor;
+
+  const ClassLearningPage({
+    super.key,
+    required this.className,
+    required this.themeColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    bool isTablet = MediaQuery.of(context).size.width > 600;
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFFFF9C4),
+      appBar: AppBar(
+        backgroundColor: themeColor,
+        title: Text(
+          "Pari ABC - $className",
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.all(isTablet ? 24.0 : 16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 6,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Aao Seekhein!",
+                          style: TextStyle(
+                            fontSize: isTablet ? 22 : 18,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF0D1B2A),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          "Apni pasand ki activity chuno beta:",
+                          style: TextStyle(
+                            fontSize: isTablet ? 16 : 13,
+                            color: Colors.grey.shade700,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Icon(Icons.auto_awesome, color: Colors.amber, size: 36),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              Expanded(
+                child: GridView.count(
+                  crossAxisCount: isTablet ? 3 : 2,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                  childAspectRatio: 1.1,
+                  children: [
+                    _buildCategoryCard(
+                      context,
+                      "Varnmala (A-Z / अ-ज्ञ)",
+                      "Akshar Seekhein",
+                      Colors.orange.shade100,
+                      Icons.menu_book,
+                    ),
+                    _buildCategoryCard(
+                      context,
+                      "Ginti (1-100 / Numbers)",
+                      "Counting Sikhein",
+                      Colors.green.shade100,
+                      Icons.pin,
+                    ),
+                    _buildCategoryCard(
+                      context,
+                      "Fals & Fruits",
+                      "Fruits & Vegetables",
+                      Colors.pink.shade100,
+                      Icons.eco,
+                    ),
+                    _buildCategoryCard(
+                      context,
+                      "Rhymes & Poems",
+                      "Mazedaar Kavitayein",
+                      Colors.blue.shade100,
+                      Icons.music_note,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCategoryCard(
+    BuildContext context,
+    String title,
+    String subtitle,
+    Color cardColor,
+    IconData iconData,
+  ) {
+    return GestureDetector(
+      onTap: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("$title khul raha hai...")),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white, width: 3),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 6,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircleAvatar(
+              radius: 28,
+              backgroundColor: Colors.white,
+              child: Icon(iconData, size: 30, color: const Color(0xFF0D1B2A)),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF0D1B2A),
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              subtitle,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey.shade800,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],
